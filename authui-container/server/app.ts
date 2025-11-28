@@ -16,6 +16,26 @@ import express = require('express');
 import {AuthServer} from './auth-server';
 
 const app = express();
+
+app.use((req, res, next) => {
+  res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.set('Content-Security-Policy',
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com; " +
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+    "img-src 'self' https://*.gstatic.com https://img.icons8.com; " +
+    "font-src https://fonts.gstatic.com; " +
+    "object-src 'none'; " +
+    "frame-ancestors 'self'; " +
+    "base-uri 'self'; " +
+    "form-action 'self'"
+  );
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('Permissions-Policy', 'geolocation=(), camera=(), microphone=()');
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('X-Frame-Options', 'DENY');
+  next();
+});
+
 const authServer = new AuthServer(app);
 authServer.start(process.env.PORT);
 
